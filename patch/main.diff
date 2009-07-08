@@ -1,0 +1,49 @@
+--- main.c	2009-04-14 23:55:29.000000000 +1000
++++ main_new.c	2009-07-08 16:41:05.843750000 +1000
+@@ -1,8 +1,15 @@
+ /* $Id: main.c 1791 2009-04-14 13:55:29Z oetiker $
+  * Substantial penalty for early withdrawal.
+  */
++#if HAVE_UNISTD_H
++#  include <sys/types.h> 
++#  include <unistd.h>   
++#  ifdef VMS
++#    include <unixio.h>  
++#  endif
++#  define z_off_t  off_t
++#endif 
+ 
+-#include <unistd.h>
+ #include <ruby.h>
+ #include "../../src/rrd_tool.h"
+ 
+@@ -303,6 +310,21 @@
+         return rb_funcall(rb_cTime, rb_intern("at"), 1, UINT2NUM(last));
+ }
+ 
++VALUE rb_rrd_first(
++    VALUE self,
++    VALUE args)
++{
++    string_arr a;
++    time_t    first;
++
++    a = string_arr_new(args);
++    reset_rrd_state();
++    first = rrd_first(a.len, a.strings);
++    string_arr_delete(a);
++
++    RRD_CHECK_ERROR
++        return rb_funcall(rb_cTime, rb_intern("at"), 1, UINT2NUM(first));
++}
+ void Init_RRD(
+     )
+ {
+@@ -314,6 +336,7 @@
+     rb_define_module_function(mRRD, "fetch", rb_rrd_fetch, -2);
+     rb_define_module_function(mRRD, "graph", rb_rrd_graph, -2);
+     rb_define_module_function(mRRD, "last", rb_rrd_last, -2);
++	rb_define_module_function(mRRD, "first", rb_rrd_first, -2);
+     rb_define_module_function(mRRD, "resize", rb_rrd_resize, -2);
+     rb_define_module_function(mRRD, "restore", rb_rrd_restore, -2);
+     rb_define_module_function(mRRD, "tune", rb_rrd_tune, -2);

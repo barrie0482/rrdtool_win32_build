@@ -1,0 +1,25 @@
+--- rrd_open.c	2009-05-19 23:45:05.000000000 +1000
++++ rrd_open.c	2009-07-08 16:06:23.921875000 +1000
+@@ -9,12 +9,16 @@
+ #include "rrd_tool.h"
+ #include "unused.h"
+ 
+-#ifdef WIN32
+-#include <stdlib.h>
+-#include <fcntl.h>
+-#include <sys/stat.h>
+-#include <utime.h>
+-#endif
++#ifdef WIN32 
++#include <stdlib.h> 
++#include <fcntl.h> 
++#include <sys/stat.h> 
++#endif 
++	 
++#ifdef HAVE_BROKEN_MS_ASYNC 
++#include <sys/types.h> 
++#include <utime.h> 
++#endif 
+ 
+ #define MEMBLK 8192
+ 
